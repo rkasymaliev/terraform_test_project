@@ -131,3 +131,6 @@ variable "asecret_key" {
 locals {
     current_time = timestamp()
 }
+output "my_public_ip" {
+  value = aws_instance.my_test_webserver.public_ip
+}
