@@ -1,0 +1,8 @@
+key_pair_name = "my_tls_key"
+tls_key_filename = "cloudtls.pem"
+Your_First_Name = "Ruslan"
+Your_Last_Name = "Kasymaliev"
+region = "us-east-1"
+instance_type = "t2.micro"
+access_key = "AKIAVDLHZG4E7UMR5O4F"
+secret_key = "SE31bXugkLdq991aAPsgjTwx45iZkTG5NhB7v+B6"
