@@ -3,7 +3,8 @@
 #
 #
 # Before start, please fill variables.tf with your Access Key and Secret Key, also specify proper S3 bucket in backend section in main.tf file.
-#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------------------------------
+
 Task 1
 1. Create EC2 Linux instance in AWS using Terraform. The instance should have attached tags: Date_creation, OS_type, Your_First_Name, Your_Last_Name, AWS_Account_ID.
 
