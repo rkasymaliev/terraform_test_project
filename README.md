@@ -1,4 +1,9 @@
 # terraform_test_project
+# made by Ruslan Kasymaliev
+#
+#
+# Before start, please fill variables.tf with your Access Key and Secret Key
+#------------------------------------------------------------------------------------------------
 Task 1
 1. Create EC2 Linux instance in AWS using Terraform. The instance should have attached tags: Date_creation, OS_type, Your_First_Name, Your_Last_Name, AWS_Account_ID.
 
