@@ -1,9 +1,4 @@
-provider "aws" {
-  region = var.region
-  access_key = var.access_key
-  secret_key = var.asecret_key
-}
-provider "http" {}
+#---ec2-instance/main.tf---
 
 data "template_file" "init" {
   template = "${file("get-tag.tpl")}"
@@ -29,14 +24,41 @@ data "http" "myip" {
   url = "http://ipv4.icanhazip.com"
 }
 
+resource "tls_private_key" "generated_key" {
+  algorithm   = "RSA"
+}
+resource "local_file" "cloud_pem" {
+  filename = var.tls_key_filename
+  content = tls_private_key.generated_key.private_key_pem
+  file_permission = "0600"
+}
+resource "aws_key_pair" "deployer" {
+  key_name   = var.key_pair_name
+  public_key = tls_private_key.generated_key.public_key_openssh
+}
 resource "aws_instance" "my_test_webserver" {
   ami = data.aws_ami.latest_Amazon_Linux.id
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   availability_zone = data.aws_availability_zones.working.names[0]
   subnet_id = aws_subnet.my_test_subnet.id
-  key_name   = "my_aws_key"
+  key_name   = var.key_pair_name
   vpc_security_group_ids = [aws_security_group.my_sg.id]
   user_data = data.template_file.init.rendered
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = tls_private_key.generated_key.private_key_pem
+    host        = self.public_dns
+  }
+  provisioner "file" {
+    source      = "text.txt"
+    destination = "~/text.txt"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "cat text.txt",
+    ]
+  }
   tags = {
     Date_creation = local.current_time
     OS_type = data.aws_ami.latest_Amazon_Linux.platform_details
@@ -91,7 +113,7 @@ resource "aws_security_group" "my_sg" {
     protocol = "tcp"
     from_port = 22
     to_port   = 22
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
   }
   ingress {
     protocol = "tcp"
@@ -106,31 +128,7 @@ resource "aws_security_group" "my_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-resource "aws_key_pair" "deployer" {
-  key_name   = "my_aws_key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC56C6nmm83BLjW+USzFhzKAuEGpLHFm46qdRwOLhZX/xPM8ZXaCRyitMYPTLMpdYnRV9Qrkysxf7SX8quy9BGF06PpdCV9VH4VLj7B5azjpUey0vYziTUTsDQ+BwtnX9jm1B7NtlQh+LnVetaDwNCKAcZoSDu4c1eQBDLwJ2hoQi5HOFByxzRZ7VLEw9aehZuQgtnqAwUdcfF8fws8abwgECn804Tu+17/+U+rwmcGqLLZxKF1sA/M4jVlA44g+GIywka6ChfjaIk2n6PTKGOI3vjpv1V93z/9JhbCBtuqbG+JnKKasHO4T4eMW1Zj0siK38wIKZ+4yY7meRarWnyR root@master"
-}
 
-variable "region" {
-  description = "Choose a region to deploy"
-}
-variable "Your_First_Name" {
-  description = "Please insert your first name"
-}
-
-variable "Your_Last_Name" {
-  description = "Please insert your last name"
-}
-variable "access_key" {
-  description = "Please insert your AWS Access Key"
-}
-
-variable "asecret_key" {
-  description = "Please insert your AWS Secret Key"
-}
 locals {
     current_time = timestamp()
-}
-output "my_public_ip" {
-  value = aws_instance.my_test_webserver.public_ip
 }
