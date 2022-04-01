@@ -2,7 +2,7 @@
 # made by Ruslan Kasymaliev
 #
 #
-# Before start, please fill variables.tf with your Access Key and Secret Key, also specify proper S3 bucket in backend section in main.tf file.
+# Before start, please fill terraform.tfvars with required information, also specify proper S3 bucket in backend section in main.tf file.
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
 Task 1
