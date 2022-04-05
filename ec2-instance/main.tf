@@ -12,24 +12,24 @@ data "template_file" "init" {
 }
 data "aws_availability_zones" "working" {}
 data "aws_ami" "latest_Amazon_Linux" {
-  owners = ["amazon"]
+  owners      = ["amazon"]
   most_recent = true
   filter {
-    name = "name"
+    name   = "name"
     values = ["amzn2-ami-kernel-*-x86_64-gp2"]
   }
 }
-data "aws_caller_identity" "current_caller"{}
+data "aws_caller_identity" "current_caller" {}
 data "http" "myip" {
   url = "http://ipv4.icanhazip.com"
 }
 
 resource "tls_private_key" "generated_key" {
-  algorithm   = "RSA"
+  algorithm = "RSA"
 }
 resource "local_file" "cloud_pem" {
-  filename = var.tls_key_filename
-  content = tls_private_key.generated_key.private_key_pem
+  filename        = var.tls_key_filename
+  content         = tls_private_key.generated_key.private_key_pem
   file_permission = "0600"
 }
 resource "aws_key_pair" "deployer" {
@@ -37,13 +37,13 @@ resource "aws_key_pair" "deployer" {
   public_key = tls_private_key.generated_key.public_key_openssh
 }
 resource "aws_instance" "my_test_webserver" {
-  ami = data.aws_ami.latest_Amazon_Linux.id
-  instance_type = var.instance_type
-  availability_zone = data.aws_availability_zones.working.names[0]
-  subnet_id = aws_subnet.my_test_subnet.id
-  key_name   = var.key_pair_name
+  ami                    = data.aws_ami.latest_Amazon_Linux.id
+  instance_type          = var.instance_type
+  availability_zone      = data.aws_availability_zones.working.names[0]
+  subnet_id              = aws_subnet.my_test_subnet.id
+  key_name               = var.key_pair_name
   vpc_security_group_ids = [aws_security_group.my_sg.id]
-  user_data = data.template_file.init.rendered
+  user_data              = data.template_file.init.rendered
   connection {
     type        = "ssh"
     user        = "ec2-user"
@@ -60,25 +60,25 @@ resource "aws_instance" "my_test_webserver" {
     ]
   }
   tags = {
-    Date_creation = local.current_time
-    OS_type = data.aws_ami.latest_Amazon_Linux.platform_details
+    Date_creation   = local.current_time
+    OS_type         = data.aws_ami.latest_Amazon_Linux.platform_details
     Your_First_Name = var.Your_First_Name
-    Your_Last_Name = var.Your_Last_Name
-    AWS_Account_ID = data.aws_caller_identity.current_caller.account_id
+    Your_Last_Name  = var.Your_Last_Name
+    AWS_Account_ID  = data.aws_caller_identity.current_caller.account_id
   }
 }
 
 resource "aws_vpc" "my_test_vpc" {
-  cidr_block       = "172.27.0.0/16"
+  cidr_block           = "172.27.0.0/16"
   enable_dns_hostnames = true
   tags = {
     Name = "my_test_vpc"
   }
 }
 resource "aws_subnet" "my_test_subnet" {
-  vpc_id            = aws_vpc.my_test_vpc.id
-  cidr_block        = "172.27.10.0/24"
-  availability_zone = data.aws_availability_zones.working.names[0]
+  vpc_id                  = aws_vpc.my_test_vpc.id
+  cidr_block              = "172.27.10.0/24"
+  availability_zone       = data.aws_availability_zones.working.names[0]
   map_public_ip_on_launch = true
 
   tags = {
@@ -110,15 +110,15 @@ resource "aws_security_group" "my_sg" {
   vpc_id = aws_vpc.my_test_vpc.id
 
   ingress {
-    protocol = "tcp"
-    from_port = 22
-    to_port   = 22
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
   }
   ingress {
-    protocol = "tcp"
-    from_port = 80
-    to_port   = 80
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
     cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
   }
   egress {
@@ -130,5 +130,5 @@ resource "aws_security_group" "my_sg" {
 }
 
 locals {
-    current_time = timestamp()
+  current_time = timestamp()
 }
