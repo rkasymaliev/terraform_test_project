@@ -10,7 +10,7 @@ data "template_file" "init" {
     output     = "json"
   }
 }
-data "aws_availability_zones" "working" {}
+#data "aws_availability_zones" "working" {}
 data "aws_ami" "latest_Amazon_Linux" {
   owners      = ["amazon"]
   most_recent = true
@@ -37,10 +37,11 @@ resource "aws_key_pair" "deployer" {
   public_key = tls_private_key.generated_key.public_key_openssh
 }
 resource "aws_instance" "my_test_webserver" {
-  ami                    = data.aws_ami.latest_Amazon_Linux.id
-  instance_type          = var.instance_type
-  availability_zone      = data.aws_availability_zones.working.names[0]
-  subnet_id              = aws_subnet.my_test_subnet.id
+  count         = var.number_of_instances
+  ami           = data.aws_ami.latest_Amazon_Linux.id
+  instance_type = var.instance_type
+  #availability_zone      = data.aws_availability_zones.working.names[0]
+  subnet_id              = data.aws_subnets.default_subnet.ids[0]
   key_name               = var.key_pair_name
   vpc_security_group_ids = [aws_security_group.my_sg.id]
   user_data              = data.template_file.init.rendered
@@ -48,7 +49,7 @@ resource "aws_instance" "my_test_webserver" {
     type        = "ssh"
     user        = "ec2-user"
     private_key = tls_private_key.generated_key.private_key_pem
-    host        = self.public_dns
+    host        = self.public_ip
   }
   provisioner "file" {
     source      = "text.txt"
@@ -67,47 +68,17 @@ resource "aws_instance" "my_test_webserver" {
     AWS_Account_ID  = data.aws_caller_identity.current_caller.account_id
   }
 }
-
-resource "aws_vpc" "my_test_vpc" {
-  cidr_block           = "172.27.0.0/16"
-  enable_dns_hostnames = true
-  tags = {
-    Name = "my_test_vpc"
-  }
+data "aws_vpc" "default_vpc" {
+  id = var.vpc_id
 }
-resource "aws_subnet" "my_test_subnet" {
-  vpc_id                  = aws_vpc.my_test_vpc.id
-  cidr_block              = "172.27.10.0/24"
-  availability_zone       = data.aws_availability_zones.working.names[0]
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "my_test_subnet"
+data "aws_subnets" "default_subnet" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
   }
-}
-resource "aws_internet_gateway" "my_gw" {
-  vpc_id = aws_vpc.my_test_vpc.id
-
-  tags = {
-    Name = "my_gw"
-  }
-}
-resource "aws_route_table" "my_route_table" {
-  vpc_id = aws_vpc.my_test_vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.my_gw.id
-  }
-  tags = {
-    Name = "my_route_table"
-  }
-}
-resource "aws_route_table_association" "a" {
-  subnet_id      = aws_subnet.my_test_subnet.id
-  route_table_id = aws_route_table.my_route_table.id
 }
 resource "aws_security_group" "my_sg" {
-  vpc_id = aws_vpc.my_test_vpc.id
+  vpc_id = var.vpc_id
 
   ingress {
     protocol    = "tcp"
