@@ -8,27 +8,32 @@ variable "region" {
 variable "vpc_id" {
   description = "VPC ID"
   type        = string
-  default     = "vpc-07352abd76d01fd67"
+  default     = "vpc-0dd496bf14f381e59"
+}
+variable "ami_id" {
+  description = "AMI ID"
+  type        = string
+  default     = "ami-0dcc0ebde7b2e00db"
 }
 variable "Your_First_Name" {
   description = "Enter your first name"
   type        = string
-  default     = "first_name"
+  default     = "Ruslan"
 }
 variable "Your_Last_Name" {
   description = "Enter your first name"
   type        = string
-  default     = "last_name"
+  default     = "Kasymaliev"
 }
 variable "access_key" {
   description = "Enter your AWS Access Key"
   type        = string
-  # default     = ""
+  default     = "some_access_key"
 }
 variable "secret_key" {
   description = "Enter your AWS Secret Access Key"
   type        = string
-  # default     = ""
+  default     = "some_secret_key"
 }
 variable "tls_key_filename" {
   description = "Private key name"
@@ -45,8 +50,8 @@ variable "instance_type" {
   type        = string
   default     = "t2.micro"
 }
-variable "number_of_instances" {
-  description = "Number of deployable instances"
+variable "ssh_user" {
+  description = "EC2 instance user"
   type        = string
-  default     = "3"
+  default     = "ec2-user"
 }

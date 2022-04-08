@@ -1,7 +1,7 @@
-#---ec2-instance/main.tf---
+#---root/main.tf---
 
 data "template_file" "init" {
-  template = "${file("get-tag.tpl")}"
+  template = file("get-tag.tpl")
 
   vars = {
     access_key = "${var.access_key}"
@@ -10,7 +10,6 @@ data "template_file" "init" {
     output     = "json"
   }
 }
-#data "aws_availability_zones" "working" {}
 data "aws_ami" "latest_Amazon_Linux" {
   owners      = ["amazon"]
   most_recent = true
@@ -22,6 +21,12 @@ data "aws_ami" "latest_Amazon_Linux" {
 data "aws_caller_identity" "current_caller" {}
 data "http" "myip" {
   url = "http://ipv4.icanhazip.com"
+}
+data "aws_subnets" "default_subnet" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
 }
 
 resource "tls_private_key" "generated_key" {
@@ -35,19 +40,20 @@ resource "local_file" "cloud_pem" {
 resource "aws_key_pair" "deployer" {
   key_name   = var.key_pair_name
   public_key = tls_private_key.generated_key.public_key_openssh
+  tags = {
+    Name = "My key pair"
+  }
 }
 resource "aws_instance" "my_test_webserver" {
-  count         = var.number_of_instances
-  ami           = data.aws_ami.latest_Amazon_Linux.id
-  instance_type = var.instance_type
-  #availability_zone      = data.aws_availability_zones.working.names[0]
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
   subnet_id              = data.aws_subnets.default_subnet.ids[0]
   key_name               = var.key_pair_name
   vpc_security_group_ids = [aws_security_group.my_sg.id]
   user_data              = data.template_file.init.rendered
   connection {
     type        = "ssh"
-    user        = "ec2-user"
+    user        = var.ssh_user
     private_key = tls_private_key.generated_key.private_key_pem
     host        = self.public_ip
   }
@@ -61,20 +67,12 @@ resource "aws_instance" "my_test_webserver" {
     ]
   }
   tags = {
+    Name            = "Task1 Web Server"
     Date_creation   = local.current_time
     OS_type         = data.aws_ami.latest_Amazon_Linux.platform_details
     Your_First_Name = var.Your_First_Name
     Your_Last_Name  = var.Your_Last_Name
     AWS_Account_ID  = data.aws_caller_identity.current_caller.account_id
-  }
-}
-data "aws_vpc" "default_vpc" {
-  id = var.vpc_id
-}
-data "aws_subnets" "default_subnet" {
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
   }
 }
 resource "aws_security_group" "my_sg" {
@@ -97,6 +95,9 @@ resource "aws_security_group" "my_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Allow HTTP and SSH from My IP"
   }
 }
 

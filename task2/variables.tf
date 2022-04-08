@@ -1,4 +1,4 @@
-#---ec2_instance/variables.tf---
+#---root/variables.tf---
 
 variable "region" {
   description = "Choose region for deployment"
@@ -8,7 +8,12 @@ variable "region" {
 variable "vpc_id" {
   description = "VPC ID"
   type        = string
-  #default = "vpc-07352abd76d01fd67"
+  default     = "vpc-0dd496bf14f381e59"
+}
+variable "ami_id" {
+  description = "AMI ID"
+  type        = string
+  default     = "ami-0dcc0ebde7b2e00db"
 }
 variable "Your_First_Name" {
   description = "Enter your first name"
@@ -19,16 +24,6 @@ variable "Your_Last_Name" {
   description = "Enter your first name"
   type        = string
   default     = "last_name"
-}
-variable "access_key" {
-  description = "Enter your AWS Access Key"
-  type        = string
-  # default     = ""
-}
-variable "secret_key" {
-  description = "Enter your AWS Secret Access Key"
-  type        = string
-  # default     = ""
 }
 variable "tls_key_filename" {
   description = "Private key name"
@@ -48,5 +43,9 @@ variable "instance_type" {
 variable "number_of_instances" {
   description = "Number of deployable instances"
   type        = string
-  default     = "3"
+  default     = "1"
+}
+variable "ssh_user" {
+  description = "EC2 instance user"
+  default     = "ec2-user"
 }

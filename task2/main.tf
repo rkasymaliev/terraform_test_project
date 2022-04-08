@@ -5,13 +5,13 @@ module "ec2-instance" {
   Your_First_Name     = var.Your_First_Name
   Your_Last_Name      = var.Your_Last_Name
   region              = var.region
-  access_key          = var.access_key
-  secret_key          = var.secret_key
   tls_key_filename    = var.tls_key_filename
   key_pair_name       = var.key_pair_name
   instance_type       = var.instance_type
   vpc_id              = var.vpc_id
+  ami_id              = var.ami_id
   number_of_instances = var.number_of_instances
+  ssh_user            = var.ssh_user
 }
 
 terraform {
