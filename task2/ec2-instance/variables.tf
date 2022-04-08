@@ -1,4 +1,6 @@
+########################################################
 #---ec2_instance/variables.tf---
+########################################################
 
 variable "region" {
   description = "Choose region for deployment"
@@ -9,6 +11,16 @@ variable "vpc_id" {
   description = "VPC ID"
   type        = string
   default     = "vpc-0dd496bf14f381e59"
+}
+variable "subnet_id" {
+  description = "Subnet ID"
+  type        = string
+  default     = ""
+}
+variable "sg_id" {
+  description = "Secury Group ID"
+  type        = string
+  default     = ""
 }
 variable "ami_id" {
   description = "AMI ID"
