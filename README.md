@@ -1,8 +1,6 @@
 # terraform_test_project
 # made by Ruslan Kasymaliev
 #
-#
-# Before start, please fill terraform.tfvars with required information, also specify proper S3 bucket in backend section in main.tf file.
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
 Task 1
