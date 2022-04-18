@@ -38,3 +38,6 @@ Task 3 - Terraform features and main structures
 5. No hardcode inside the modules. Everything should be declared as variables and all of them should be set in .tfvars file 
 6. Outputs should present for all the created resources. You can choose any you prefer, but for each resource described in your code. 
 7. Output of terraform apply command should be also stored in a file and committed to your branch
+
+Task 4 - understanding the key feature of TF 13
+1. Modify the component module created in Task 3, so we can create multiple EC2 instances using map of parameters for EC2 instances. for each for modules should be used here.
