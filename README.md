@@ -39,3 +39,9 @@ Task 3 - Terraform features and main structures
 
 Task 4 - understanding the key feature of TF 13
 1. Modify the component module created in Task 3, so we can create multiple EC2 instances using map of parameters for EC2 instances. for each for modules should be used here.
+
+Task 5
+1. Need to create a module for ASG (includes asg and launch configuration)
+2. Need to create a module for ECS specific resources (ECS service, ECS cluster, ECS task definition)
+3. Add user data into ASG module to include EC2 instances into ECS cluster.
+4. Deploy centos container (https://hub.docker.com/_/centos) to ECS using your modules.
