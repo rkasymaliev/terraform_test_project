@@ -12,9 +12,9 @@ output "null_resource_output" {
 }
 output "sg_rule_id" {
   description = "Prints SG-Module Security Group Rule ID"
-  value       = module.sg.sg_rule_id
+  value       = module.sg.*.sg_rule_id
 }
 output "sg_id" {
   description = "Prints SG-Module Security Group ID"
-  value       = module.sg.sg_id
+  value       = module.sg.*.sg_id[0]
 }

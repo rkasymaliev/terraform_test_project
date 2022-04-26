@@ -5,28 +5,26 @@
 variable "region" {
   description = "Choose region for deployment"
   type        = string
-  default     = ""
+  default     = "eu-central-1"
 }
 variable "default_vpc_id" {
   description = "Default VPC ID"
   type        = string
-  default     = ""
 }
 variable "vpc_id" {
   description = "VPC ID"
   type        = string
-  default     = ""
 }
-# variable "subnet_id" {
-#   description = "Subnet ID"
-#   type        = string
-#   default     = ""
-# }
-# variable "sg_id" {
-#   description = "Secury Group ID"
-#   type        = list(string)
-#   default     = []
-# }
+variable "default_user" {
+  description = "Default user"
+  type        = string
+  default     = "ubuntu"
+}
+variable "default_ami" {
+  description = "Default ami"
+  type        = string
+  default     = "ami-0d527b8c289b4af7f"
+}
 variable "sg_ingress_rules" {
   description = "List of ports for allow rules"
   type        = list(map(any))
@@ -40,12 +38,11 @@ variable "instance_params" {
 variable "tls_key_filename" {
   description = "Private key name"
   type        = string
-  default     = ""
 }
 variable "key_pair_name" {
   description = "Name tag of a key pair"
   type        = string
-  default     = ""
+  default     = "task4_key_pair"
 }
 variable "os_type" {
   description = "The EC2 instance user and ami_id to be used"
@@ -65,5 +62,4 @@ variable "user_data_template_file" {
 variable "subnet_template" {
   description = "Template for aws_subnet filter"
   type        = string
-  default     = ""
 }

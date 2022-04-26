@@ -2,21 +2,20 @@
 #---root/main.tf---
 ########################################################
 
-locals {
-  ami_id   = lookup(var.os_type.amazon, "ami_id")
-  username = lookup(var.os_type.amazon, "user")
-}
 resource "tls_private_key" "generated_key" {
+  count     = length(var.instance_params) > 0 ? 1:0
   algorithm = "RSA"
 }
 resource "local_file" "cloud_pem" {
+  count           = length(var.instance_params) > 0 ? 1:0
   filename        = var.tls_key_filename
-  content         = tls_private_key.generated_key.private_key_pem
+  content         = tls_private_key.generated_key[count.index].private_key_pem
   file_permission = "0600"
 }
 resource "aws_key_pair" "deployer" {
+  count      = length(var.instance_params) > 0 ? 1:0
   key_name   = var.key_pair_name
-  public_key = tls_private_key.generated_key.public_key_openssh
+  public_key = tls_private_key.generated_key[count.index].public_key_openssh
   tags = {
     Name = "My Key Pair"
   }
@@ -28,11 +27,12 @@ module "ec2-instance" {
   Your_Last_Name          = each.value.Your_Last_Name
   key_pair_name           = var.key_pair_name
   instance_type           = each.value.instance_type
-  ami_id                  = local.ami_id
-  number_of_instances     = each.value.number_of_instances
+  ami_id                  = lookup(lookup(var.os_type, each.value.os_type), "ami_id")
+  user_id                 = lookup(lookup(var.os_type, each.value.os_type), "user")
   subnet_id               = module.network.subnet_id
-  sg_id                   = module.sg.sg_id
-  environment             = each.key
+  sg_id                   = module.sg.*.sg_id[0]
+  environment             = each.value.env
+  instance_name           = each.key
   user_data_template_file = file("scripts/${var.user_data_template_file}")
   additional_tags         = var.additional_tags
   volume_size             = each.value.volume_size
@@ -44,16 +44,18 @@ module "network" {
   subnet_template = var.subnet_template
 }
 module "sg" {
+  count            = length(var.instance_params) > 0 ? 1:0
   source           = "./sg"
   vpc_id           = var.vpc_id != "" ? var.vpc_id : var.default_vpc_id
   sg_ingress_rules = var.sg_ingress_rules
 }
+
 resource "null_resource" "remote" {
   for_each = module.ec2-instance
   connection {
     type        = "ssh"
-    user        = local.username
-    private_key = tls_private_key.generated_key.private_key_pem
+    user        = each.value.user_id
+    private_key = tls_private_key.generated_key[0].private_key_pem
     host        = each.value.public_ip[0]
   }
   provisioner "remote-exec" {

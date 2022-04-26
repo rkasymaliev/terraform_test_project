@@ -29,21 +29,50 @@ os_type = {
 }
 # EC2-Instance parameters
 instance_params = {
-  dev = {
-    number_of_instances = 1,
+  dev1 = {
+    os_type             = "ubuntu"
     instance_type       = "t2.micro",
     volume_size         = 8,
     volume_type         = "gp3",
     Your_First_Name     = "Ruslan-dev",
     Your_Last_Name      = "Kasymaliev-dev"
+    env                 = "dev"
   },
-  prod = {
-    number_of_instances = 1,
+  dev2 = {
+    os_type             = "ubuntu"
+    instance_type       = "t2.micro",
+    volume_size         = 8,
+    volume_type         = "gp3",
+    Your_First_Name     = "Ruslan-dev",
+    Your_Last_Name      = "Kasymaliev-dev"
+    env                 = "dev"
+  },
+  prod1 = {
+    os_type             = "amazon"
     instance_type       = "t2.micro",
     volume_size         = 10,
     volume_type         = "gp3",
     Your_First_Name     = "Ruslan",
     Your_Last_Name      = "Kasymaliev"
+    env                 = "prod"
+  },
+  prod2 = {
+    os_type             = "amazon"
+    instance_type       = "t2.micro",
+    volume_size         = 10,
+    volume_type         = "gp3",
+    Your_First_Name     = "Ruslan",
+    Your_Last_Name      = "Kasymaliev"
+    env                 = "prod"
+  },
+  prod3 = {
+    os_type             = "amazon"
+    instance_type       = "t2.micro",
+    volume_size         = 10,
+    volume_type         = "gp3",
+    Your_First_Name     = "Ruslan",
+    Your_Last_Name      = "Kasymaliev"
+    env                 = "prod"
   }
 }
 # SG rule ports - list(map)

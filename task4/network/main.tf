@@ -7,6 +7,10 @@ data "aws_subnet" "subnet" {
     name   = "vpc-id"
     values = [var.vpc_id]
   }
+  filter {
+    name   = "availabilityZone"
+    values = ["eu-central-1c"]
+  }
   tags = {
     "Name" = "*${var.subnet_template}*"
   }
